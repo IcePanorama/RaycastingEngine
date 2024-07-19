@@ -20,6 +20,8 @@ uint8_t test_map[64] = {
 };
 /* clang-format on */
 
+void handle_player_input (void);
+
 int
 main (void)
 {
@@ -31,6 +33,8 @@ main (void)
 
   while (!WindowShouldClose ())
     {
+      player.handle_player_input ();
+
       BeginDrawing ();
       ClearBackground (LIGHTGRAY);
       map.draw_2d_map (0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);

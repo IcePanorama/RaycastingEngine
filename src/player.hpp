@@ -8,6 +8,7 @@ class Player
 public:
   Vector2 position;
   double angle;
+  double speed = 100;
 
   Player (void) : position{ 0, 0 }, angle (0) {}
   Player (double angle) : position{ 0, 0 }, angle (angle) {}
@@ -22,6 +23,7 @@ public:
   }
 
   void draw_player (void);
+  void handle_player_input (void);
 
   ~Player (void) = default;
 };

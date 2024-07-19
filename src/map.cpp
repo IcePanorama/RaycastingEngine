@@ -31,7 +31,7 @@ Map::draw_2d_map (uint32_t start_x, uint32_t start_y, uint32_t end_x,
                   uint32_t end_y)
 {
   const uint8_t GAP_OFFSET = 3;
-  const Color FLOOR_COLOR = BLACK;
+  const Color FLOOR_COLOR = WHITE;
   const Color WALL_COLOR = YELLOW;
 
   uint8_t width = get_width ();
