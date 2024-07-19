@@ -1,56 +1,54 @@
 #include "map.hpp"
 
-/**
- *  Map::Map
- *
- *  Constructor for the `Map` class.
- *
- *  @param  width   the width of the map
- *  @param  length  the length of the map
- *  @param  map     the actual map data itself
- */
+#include <cstdint>
+#include <raylib.h>
+
 Map::Map (uint8_t width, uint8_t length, uint8_t *map)
+    : width (width), length (length), map (map)
 {
-  this->width = width;
-  this->length = length;
-  this->map = map;
 }
 
-/**
- *  Map::get_width
- *
- *  Returns the width of this map.
- *
- *  @return uint8_t of the map width
- */
 uint8_t
 Map::get_width (void) const
 {
   return this->width;
 }
 
-/**
- *  Map::get_length
- *
- *  Returns the length of this map.
- *
- *  @return uint8_t of the map length
- */
 uint8_t
 Map::get_length (void) const
 {
   return this->length;
 }
 
-/**
- *  Map::get_map
- *
- *  Returns the underlying array of this map.
- *
- *  @return the underlying map array
- */
 uint8_t *
 Map::get_map (void) const
 {
   return this->map;
+}
+
+void
+Map::draw_2d_map (Map &m, uint32_t start_x, uint32_t start_y, uint32_t end_x,
+                  uint32_t end_y)
+{
+  const uint8_t GAP_OFFSET = 3;
+  const Color FLOOR_COLOR = BLACK;
+  const Color WALL_COLOR = YELLOW;
+
+  uint8_t width = m.get_width ();
+  uint8_t length = m.get_length ();
+  const uint8_t LEN_SCALE = (end_y - start_y) / length;
+  const uint8_t WIDTH_SCALE = (end_x - start_x) / width;
+  uint8_t size = width * length;
+
+  for (uint8_t i = 0; i < size; i++)
+    {
+      uint8_t row = i / width;
+      uint8_t col = i % width;
+
+      Color c = m.get_map ()[i] == 1 ? WALL_COLOR : FLOOR_COLOR;
+      DrawRectangle (start_x + (col * WIDTH_SCALE + GAP_OFFSET),
+                     start_y + (row * LEN_SCALE + GAP_OFFSET),
+                     WIDTH_SCALE - 2 * GAP_OFFSET, LEN_SCALE - 2 * GAP_OFFSET,
+                     c);
+    }
 }
