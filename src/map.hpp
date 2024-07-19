@@ -32,14 +32,13 @@ public:
    * actual top right corner of the map on screen will be
    *  `(start_x + GAP_OFFSET / 2, start_y + GAP_OFFSET / 2)`.
    *
-   *  @param  m       map to draw
    *  @param  start_x x position of the top right corner on screen
    *  @param  start_y y position of the top right corner on screen
    *  @param  end_x   where map drawing should end on x-axis
    *  @param  end_y   where map drawing should end on y-axis
    * screen
    */
-  void draw_2d_map (Map &m, uint32_t start_x, uint32_t start_y, uint32_t end_x,
+  void draw_2d_map (uint32_t start_x, uint32_t start_y, uint32_t end_x,
                     uint32_t end_y);
 
   ~Map () = default;
