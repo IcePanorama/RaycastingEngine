@@ -21,6 +21,8 @@ public:
   {
   }
 
+  void draw_player (void);
+
   ~Player (void) = default;
 };
 
