@@ -7,7 +7,7 @@ TARGET=main
 CFLAGS=-Wall -Werror -Wextra -Wpedantic
 STYLE=GNU
 
-all: clean format $(TARGET) test
+all: clean format $(TARGET)
 
 no-test: clean $(TARGET)
 
