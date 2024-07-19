@@ -9,11 +9,15 @@ public:
   Vector2 position;
   double angle;
 
-  Player (void) : position ((Vector2){ 0, 0 }), angle (0) {}
-  Player (float x, float y) : position ((Vector2){ x, y }), angle (0) {}
-  Player (double angle) : angle (angle) {}
-  Player (float x, float y, double angle)
-      : position ((Vector2){ x, y }), angle (angle)
+  Player (void) : position{ 0, 0 }, angle (0) {}
+  Player (double angle) : position{ 0, 0 }, angle (angle) {}
+  Player (Vector2 position) : position (position), angle (0) {}
+  Player (Vector2 position, double angle) : position (position), angle (angle)
+  {
+  }
+  Player (float x_pos, float y_pos) : position{ x_pos, y_pos }, angle (0) {}
+  Player (float x_pos, float y_pos, double angle)
+      : position{ x_pos, y_pos }, angle (angle)
   {
   }
 
