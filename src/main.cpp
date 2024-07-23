@@ -1,9 +1,9 @@
 #include "map.hpp"
 #include "player.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <raylib.h>
 
@@ -23,13 +23,10 @@ uint8_t test_map[64] = {
 };
 /* clang-format on */
 
-// void cast_rays (Player &p, Map &m, uint32_t start_x, uint32_t end_x);
-
 int
 main (void)
 {
-  InitWindow (WINDOW_WIDTH, WINDOW_HEIGHT,
-              "Raylib [core] example - basic window");
+  InitWindow (WINDOW_WIDTH, WINDOW_HEIGHT, "Raycasting Engine :)");
 
   Map map (8, 8, test_map);
   Player player (WINDOW_WIDTH / 4.0, WINDOW_HEIGHT / 2.0);
@@ -41,19 +38,24 @@ main (void)
       BeginDrawing ();
       ClearBackground (LIGHTGRAY);
       map.draw_2d_map (0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
+
+      const double FOV_RADS = player.FOV * DEG2RAD;
+      for (int i = WINDOW_WIDTH / 2.0; i < WINDOW_WIDTH; i++)
+        {
+          double angle
+              = player.angle - (FOV_RADS / 2.0)
+                + (i - WINDOW_WIDTH / 2.0) * (FOV_RADS / (WINDOW_WIDTH / 2.0));
+
+          float ray_x = std::cosf (angle) * player.view_plane_dist;
+          float ray_y = std::sinf (angle) * player.view_plane_dist;
+          DrawLineV (player.position,
+                     { player.position.x + ray_x, player.position.y + ray_y },
+                     GREEN);
+        }
+
       player.draw_player ();
-
-      // cast_rays (player, map, WINDOW_WIDTH / 2, WINDOW_WIDTH);
-
       EndDrawing ();
     }
 
   return 0;
 }
-
-/*
-void
-cast_rays (Player &p, Map &m, uint32_t start_x, uint32_t end_x)
-{
-}
-*/

@@ -40,7 +40,6 @@ public:
    */
   void draw_2d_map (uint32_t start_x, uint32_t start_y, uint32_t end_x,
                     uint32_t end_y);
-
   ~Map () = default;
 };
 

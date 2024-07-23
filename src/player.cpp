@@ -11,12 +11,6 @@ Player::draw_player (void)
   const uint8_t RADIUS = 10;
   DrawCircle (position.x, position.y, RADIUS, COLOR);
 
-  float player_dx = std::cos (angle) * (RADIUS * RADIUS);
-  float player_dy = std::sin (angle) * (RADIUS * RADIUS);
-  DrawLineV (position, { position.x + player_dx, position.y + player_dy },
-             COLOR);
-
-  /* Draw viewplane */
   double half_fov_rads = FOV * DEG2RAD / 2.0;
   Vector2 left_endpoint, right_endpoint;
   left_endpoint.x
@@ -28,7 +22,12 @@ Player::draw_player (void)
   right_endpoint.y
       = position.y + std::sin (angle + half_fov_rads) * view_plane_dist;
 
-  DrawLineV (left_endpoint, right_endpoint, GREEN);
+  DrawLineV (left_endpoint, right_endpoint, COLOR);
+
+  float player_dx = std::cos (angle) * view_plane_dist;
+  float player_dy = std::sin (angle) * view_plane_dist;
+  DrawLineV (position, { position.x + player_dx, position.y + player_dy },
+             COLOR);
 }
 
 void
