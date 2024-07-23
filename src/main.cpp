@@ -1,7 +1,10 @@
 #include "map.hpp"
 #include "player.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
+#include <cstdlib>
 #include <raylib.h>
 
 const uint16_t WINDOW_WIDTH = 1280;
@@ -20,7 +23,7 @@ uint8_t test_map[64] = {
 };
 /* clang-format on */
 
-void handle_player_input (void);
+// void cast_rays (Player &p, Map &m, uint32_t start_x, uint32_t end_x);
 
 int
 main (void)
@@ -39,8 +42,18 @@ main (void)
       ClearBackground (LIGHTGRAY);
       map.draw_2d_map (0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT);
       player.draw_player ();
+
+      // cast_rays (player, map, WINDOW_WIDTH / 2, WINDOW_WIDTH);
+
       EndDrawing ();
     }
 
   return 0;
 }
+
+/*
+void
+cast_rays (Player &p, Map &m, uint32_t start_x, uint32_t end_x)
+{
+}
+*/

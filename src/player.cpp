@@ -15,6 +15,20 @@ Player::draw_player (void)
   float player_dy = std::sin (angle) * (RADIUS * RADIUS);
   DrawLineV (position, { position.x + player_dx, position.y + player_dy },
              COLOR);
+
+  /* Draw viewplane */
+  double half_fov_rads = FOV * DEG2RAD / 2.0;
+  Vector2 left_endpoint, right_endpoint;
+  left_endpoint.x
+      = position.x + std::cos (angle - half_fov_rads) * view_plane_dist;
+  left_endpoint.y
+      = position.y + std::sin (angle - half_fov_rads) * view_plane_dist;
+  right_endpoint.x
+      = position.x + std::cos (angle + half_fov_rads) * view_plane_dist;
+  right_endpoint.y
+      = position.y + std::sin (angle + half_fov_rads) * view_plane_dist;
+
+  DrawLineV (left_endpoint, right_endpoint, GREEN);
 }
 
 void

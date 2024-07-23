@@ -34,8 +34,10 @@ Map::draw_2d_map (uint32_t start_x, uint32_t start_y, uint32_t end_x,
   const Color FLOOR_COLOR = WHITE;
   const Color WALL_COLOR = YELLOW;
 
-  uint8_t width = get_width ();
-  uint8_t length = get_length ();
+  /*
+  uint8_t width = width;
+  uint8_t length = length;
+  */
   const uint8_t LEN_SCALE = (end_y - start_y) / length;
   const uint8_t WIDTH_SCALE = (end_x - start_x) / width;
   uint8_t size = width * length;
