@@ -9,16 +9,16 @@ public:
   Vector2 position;
   double angle;
   double speed = 100.0;
-  double FOV = 90.0;
+  double FOV = PI / 2.0;
   double view_plane_dist = 100;
 
-  Player (void) : position{ 0, 0 }, angle (0) {}
+  Player (void) : position{ 0, 0 }, angle (PI) {}
   Player (double angle) : position{ 0, 0 }, angle (angle) {}
-  Player (Vector2 position) : position (position), angle (0) {}
+  Player (Vector2 position) : position (position), angle (PI) {}
   Player (Vector2 position, double angle) : position (position), angle (angle)
   {
   }
-  Player (float x_pos, float y_pos) : position{ x_pos, y_pos }, angle (0) {}
+  Player (float x_pos, float y_pos) : position{ x_pos, y_pos }, angle (PI) {}
   Player (float x_pos, float y_pos, double angle)
       : position{ x_pos, y_pos }, angle (angle)
   {
