@@ -2,17 +2,26 @@
 #include "player.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <raylib.h>
+#include <vector>
 
-void cast_rays (Player &p);
+void cast_rays (Player &p, std::vector<uint32_t> t[8]);
+void generate_textures (std::vector<uint32_t> t[8]);
 
 int
 main (void)
 {
   Player player (Vector2{ 12.0f, 12.0f }, Vector2{ -1.0f, 0.0f },
                  Vector2{ 0.0f, 0.66f });
+
+  std::vector<uint32_t> texture[8];
+  for (uint8_t i = 0; i < 8; i++)
+    texture[i].resize (TEXTURE_WIDTH * TEXTURE_HEIGHT);
+
+  generate_textures (texture);
 
   InitWindow (SCREEN_WIDTH, SCREEN_HEIGHT, "Raycasting Engine");
 
@@ -23,7 +32,7 @@ main (void)
       BeginDrawing ();
       ClearBackground (BLACK);
 
-      cast_rays (player);
+      cast_rays (player, texture);
 
       DrawFPS (0, 0);
       EndDrawing ();
@@ -33,7 +42,7 @@ main (void)
 }
 
 void
-cast_rays (Player &p)
+cast_rays (Player &p, std::vector<uint32_t> t[8])
 {
   for (int x = 0; x < SCREEN_WIDTH; x++)
     {
@@ -56,8 +65,7 @@ cast_rays (Player &p)
 
       double perp_wall_dist;
 
-      // which directory to step in, x- or y-p.direction (either +1 or
-      // -1)
+      // which directory to step in, x- or y- direction (either +1 or -1)
       int step_x, step_y;
 
       bool hit = false;
@@ -118,6 +126,7 @@ cast_rays (Player &p)
       if (draw_end >= SCREEN_HEIGHT)
         draw_end = SCREEN_HEIGHT - 1;
 
+      /*
       Color color;
       switch (world_map[map_x][map_y])
         {
@@ -142,7 +151,63 @@ cast_rays (Player &p)
         color = Color{ (unsigned char)(color.r / 2.0),
                        (unsigned char)(color.g / 2.0),
                        (unsigned char)(color.b / 2.0), color.a };
+       */
 
-      DrawLine (x, draw_start, x, draw_end, color);
+      int tex_num = world_map[map_x][map_y] - 1;
+      float wall_x;
+      if (side == 0)
+        wall_x = p.position.y + perp_wall_dist * ray_dir.y;
+      else
+        wall_x = p.position.x + perp_wall_dist * ray_dir.x;
+      wall_x -= floorf (wall_x);
+
+      int tex_x = (int)(wall_x * float (TEXTURE_WIDTH));
+      if (side == 0 && ray_dir.x > 0)
+        tex_x = TEXTURE_WIDTH - tex_x - 1;
+      if (side == 1 && ray_dir.y < 0)
+        tex_x = TEXTURE_WIDTH - tex_x - 1;
+
+      float step = 1.0 * TEXTURE_HEIGHT / line_height;
+      float tex_pos
+          = (draw_start - SCREEN_HEIGHT / 2.0 + line_height / 2.0) * step;
+      for (int y = draw_start; y < draw_end; y++)
+        {
+          int tex_y = (int)tex_pos & (TEXTURE_HEIGHT - 1);
+          tex_pos += step;
+          uint32_t color = t[tex_num][TEXTURE_HEIGHT * tex_y + tex_x];
+          if (side == 1)
+            color = (color >> 1) & 8355711;
+          Color real_color = Color{ (uint8_t)((color >> 16) & 0xFF),
+                                    (uint8_t)((color >> 8) & 0xFF),
+                                    (uint8_t)(color & 0xFF), 255 };
+          DrawPixel (x, y, real_color);
+        }
+    }
+}
+
+void
+generate_textures (std::vector<uint32_t> t[8])
+{
+  for (uint8_t x = 0; x < TEXTURE_WIDTH; x++)
+    {
+      for (uint8_t y = 0; y < TEXTURE_HEIGHT; y++)
+        {
+          uint16_t xor_color
+              = (x * 256 / TEXTURE_WIDTH) ^ (y * 256 / TEXTURE_HEIGHT);
+          uint16_t y_color = y * 256 / TEXTURE_HEIGHT;
+          uint16_t xy_color
+              = y * 128 / TEXTURE_HEIGHT + x * 128 / TEXTURE_WIDTH;
+          t[0][TEXTURE_WIDTH * y + x]
+              = 65536 * 254 * (x != y && x != TEXTURE_WIDTH - y);
+          t[1][TEXTURE_WIDTH * y + x]
+              = xy_color + 256 * xy_color + 65536 * xy_color;
+          t[2][TEXTURE_WIDTH * y + x] = 256 * xy_color + 65536 * xy_color;
+          t[3][TEXTURE_WIDTH * y + x]
+              = xor_color + 256 * xor_color + 65536 * xor_color;
+          t[4][TEXTURE_WIDTH * y + x] = 256 * xor_color;
+          t[5][TEXTURE_WIDTH * y + x] = 65536 * 192 * (x % 16 && y % 16);
+          t[6][TEXTURE_WIDTH * y + x] = 65536 * y_color;
+          t[7][TEXTURE_WIDTH * y + x] = 128 + 256 * 128 + 65536 * 128;
+        }
     }
 }
