@@ -121,10 +121,10 @@ main (void)
           Vector2 side_dist = { 0.0f, 0.0f };
 
           // len of ray from one x- or y-side to the next x- or y-side
-          double delta_dist_x
-              = (ray_dir.x == 0) ? 1e30 : std::abs (1 / ray_dir.x);
-          double delta_dist_y
-              = (ray_dir.y == 0) ? 1e30 : std::abs (1 / ray_dir.y);
+          Vector2 delta_dist;
+          delta_dist.x = (ray_dir.x == 0) ? 1e30 : std::abs (1 / ray_dir.x);
+          delta_dist.y = (ray_dir.y == 0) ? 1e30 : std::abs (1 / ray_dir.y);
+
           double perp_wall_dist;
 
           // which directory to step in, x- or y-direction (either +1 or -1)
@@ -136,35 +136,35 @@ main (void)
           if (ray_dir.x < 0)
             {
               step_x = -1;
-              side_dist.x = (position.x - map_x) * delta_dist_x;
+              side_dist.x = (position.x - map_x) * delta_dist.x;
             }
           else
             {
               step_x = 1;
-              side_dist.x = (map_x + 1.0 - position.x) * delta_dist_x;
+              side_dist.x = (map_x + 1.0 - position.x) * delta_dist.x;
             }
           if (ray_dir.y < 0)
             {
               step_y = -1;
-              side_dist.y = (position.y - map_y) * delta_dist_y;
+              side_dist.y = (position.y - map_y) * delta_dist.y;
             }
           else
             {
               step_y = 1;
-              side_dist.y = (map_y + 1.0 - position.y) * delta_dist_y;
+              side_dist.y = (map_y + 1.0 - position.y) * delta_dist.y;
             }
 
           while (!hit)
             {
               if (side_dist.x < side_dist.y)
                 {
-                  side_dist.x += delta_dist_x;
+                  side_dist.x += delta_dist.x;
                   map_x += step_x;
                   side = 0;
                 }
               else
                 {
-                  side_dist.y += delta_dist_y;
+                  side_dist.y += delta_dist.y;
                   map_y += step_y;
                   side = 1;
                 }
@@ -173,9 +173,9 @@ main (void)
             }
 
           if (side == 0)
-            perp_wall_dist = (side_dist.x - delta_dist_x);
+            perp_wall_dist = (side_dist.x - delta_dist.x);
           else
-            perp_wall_dist = (side_dist.y - delta_dist_y);
+            perp_wall_dist = (side_dist.y - delta_dist.y);
 
           int line_height = (int)(SCREEN_HEIGHT / perp_wall_dist);
 
