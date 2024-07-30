@@ -1,3 +1,5 @@
+#include "player.hpp"
+
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -38,54 +40,61 @@ int world_map[MAP_WIDTH][MAP_HEIGHT] = {
 int
 main (void)
 {
-  Vector2 position = { 12.0f, 12.0f };
-  Vector2 direction = { -1.0f, 0.0f };
+  Player player (Vector2{ 12.0f, 12.0f }, Vector2{ -1.0f, 0.0f });
   Vector2 plane = { 0.0f, 0.66f };
 
   InitWindow (SCREEN_WIDTH, SCREEN_HEIGHT, "Raycasting Engine");
 
   while (!WindowShouldClose ())
     {
-      double move_speed = 5.0;
-      double rot_speed = 3.0 * GetFrameTime ();
+      double move_speed = player.movement_speed;
+      double rot_speed = player.rotation_speed * GetFrameTime ();
 
       if (IsKeyDown (KEY_W) || IsKeyDown (KEY_UP))
         {
-          double move_amount_x = direction.x * move_speed * GetFrameTime ();
-          double move_amount_y = direction.y * move_speed * GetFrameTime ();
-          if (world_map[(int)(position.x + move_amount_x)][(int)position.y]
+          double move_amount_x
+              = player.direction.x * move_speed * GetFrameTime ();
+          double move_amount_y
+              = player.direction.y * move_speed * GetFrameTime ();
+          if (world_map[(int)(player.position.x + move_amount_x)]
+                       [(int)player.position.y]
               == 0)
             {
-              position.x += move_amount_x;
+              player.position.x += move_amount_x;
             }
-          if (world_map[(int)position.x][(int)(position.y + move_amount_y)]
+          if (world_map[(int)player.position.x]
+                       [(int)(player.position.y + move_amount_y)]
               == 0)
             {
-              position.y += move_amount_y;
+              player.position.y += move_amount_y;
             }
         }
       if (IsKeyDown (KEY_S) || IsKeyDown (KEY_DOWN))
         {
-          double move_amount_x = direction.x * move_speed * GetFrameTime ();
-          double move_amount_y = direction.y * move_speed * GetFrameTime ();
-          if (world_map[(int)(position.x - move_amount_x)][(int)position.y]
+          double move_amount_x
+              = player.direction.x * move_speed * GetFrameTime ();
+          double move_amount_y
+              = player.direction.y * move_speed * GetFrameTime ();
+          if (world_map[(int)(player.position.x - move_amount_x)]
+                       [(int)player.position.y]
               == 0)
             {
-              position.x -= move_amount_x;
+              player.position.x -= move_amount_x;
             }
-          if (world_map[(int)position.x][(int)(position.y - move_amount_y)]
+          if (world_map[(int)player.position.x]
+                       [(int)(player.position.y - move_amount_y)]
               == 0)
             {
-              position.y -= move_amount_y;
+              player.position.y -= move_amount_y;
             }
         }
       if (IsKeyDown (KEY_D) || IsKeyDown (KEY_RIGHT))
         {
-          double old_dir_x = direction.x;
-          direction.x = direction.x * cos (-rot_speed)
-                        - direction.y * sin (-rot_speed);
-          direction.y
-              = old_dir_x * sin (-rot_speed) + direction.y * cos (-rot_speed);
+          double old_dir_x = player.direction.x;
+          player.direction.x = player.direction.x * cos (-rot_speed)
+                               - player.direction.y * sin (-rot_speed);
+          player.direction.y = old_dir_x * sin (-rot_speed)
+                               + player.direction.y * cos (-rot_speed);
           double old_plane_x = plane.x;
           plane.x = plane.x * cos (-rot_speed) - plane.y * sin (-rot_speed);
           plane.y
@@ -93,11 +102,11 @@ main (void)
         }
       if (IsKeyDown (KEY_A) || IsKeyDown (KEY_LEFT))
         {
-          double old_dir_x = direction.x;
-          direction.x
-              = direction.x * cos (rot_speed) - direction.y * sin (rot_speed);
-          direction.y
-              = old_dir_x * sin (rot_speed) + direction.y * cos (rot_speed);
+          double old_dir_x = player.direction.x;
+          player.direction.x = player.direction.x * cos (rot_speed)
+                               - player.direction.y * sin (rot_speed);
+          player.direction.y = old_dir_x * sin (rot_speed)
+                               + player.direction.y * cos (rot_speed);
           double old_plane_x = plane.x;
           plane.x = plane.x * cos (rot_speed) - plane.y * sin (rot_speed);
           plane.y = old_plane_x * sin (rot_speed) + plane.y * cos (rot_speed);
@@ -110,12 +119,12 @@ main (void)
         {
           // x-coordinate in camera space
           float camera_x = 2 * x / float (SCREEN_WIDTH) - 1;
-          Vector2 ray_dir = { direction.x + plane.x * camera_x,
-                              direction.y + plane.y * camera_x };
+          Vector2 ray_dir = { player.direction.x + plane.x * camera_x,
+                              player.direction.y + plane.y * camera_x };
 
           // which map cell we're in
-          int map_x = int (position.x);
-          int map_y = int (position.y);
+          int map_x = int (player.position.x);
+          int map_y = int (player.position.y);
 
           // len of ray from current pos to next x- or y-side
           Vector2 side_dist = { 0.0f, 0.0f };
@@ -127,7 +136,8 @@ main (void)
 
           double perp_wall_dist;
 
-          // which directory to step in, x- or y-direction (either +1 or -1)
+          // which directory to step in, x- or y-player.direction (either +1 or
+          // -1)
           int step_x, step_y;
 
           bool hit = false;
@@ -136,22 +146,23 @@ main (void)
           if (ray_dir.x < 0)
             {
               step_x = -1;
-              side_dist.x = (position.x - map_x) * delta_dist.x;
+              side_dist.x = (player.position.x - map_x) * delta_dist.x;
             }
           else
             {
               step_x = 1;
-              side_dist.x = (map_x + 1.0 - position.x) * delta_dist.x;
+              side_dist.x = (map_x + 1.0 - player.position.x) * delta_dist.x;
             }
+
           if (ray_dir.y < 0)
             {
               step_y = -1;
-              side_dist.y = (position.y - map_y) * delta_dist.y;
+              side_dist.y = (player.position.y - map_y) * delta_dist.y;
             }
           else
             {
               step_y = 1;
-              side_dist.y = (map_y + 1.0 - position.y) * delta_dist.y;
+              side_dist.y = (map_y + 1.0 - player.position.y) * delta_dist.y;
             }
 
           while (!hit)
@@ -214,6 +225,7 @@ main (void)
 
           DrawLine (x, draw_start, x, draw_end, color);
         }
+
       DrawFPS (0, 0);
       EndDrawing ();
     }
