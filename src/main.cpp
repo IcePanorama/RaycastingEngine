@@ -38,12 +38,9 @@ int world_map[MAP_WIDTH][MAP_HEIGHT] = {
 int
 main (void)
 {
-  // double pos_x = 12.0;
-  // double pos_y = 12.0;
   Vector2 position = { 12.0f, 12.0f };
   Vector2 direction = { -1.0f, 0.0f };
-  double plane_x = 0.0;
-  double plane_y = 0.66;
+  Vector2 plane = { 0.0f, 0.66f };
 
   InitWindow (SCREEN_WIDTH, SCREEN_HEIGHT, "Raycasting Engine");
 
@@ -89,10 +86,10 @@ main (void)
                         - direction.y * sin (-rot_speed);
           direction.y
               = old_dir_x * sin (-rot_speed) + direction.y * cos (-rot_speed);
-          double old_plane_x = plane_x;
-          plane_x = plane_x * cos (-rot_speed) - plane_y * sin (-rot_speed);
-          plane_y
-              = old_plane_x * sin (-rot_speed) + plane_y * cos (-rot_speed);
+          double old_plane_x = plane.x;
+          plane.x = plane.x * cos (-rot_speed) - plane.y * sin (-rot_speed);
+          plane.y
+              = old_plane_x * sin (-rot_speed) + plane.y * cos (-rot_speed);
         }
       if (IsKeyDown (KEY_A) || IsKeyDown (KEY_LEFT))
         {
@@ -101,9 +98,9 @@ main (void)
               = direction.x * cos (rot_speed) - direction.y * sin (rot_speed);
           direction.y
               = old_dir_x * sin (rot_speed) + direction.y * cos (rot_speed);
-          double old_plane_x = plane_x;
-          plane_x = plane_x * cos (rot_speed) - plane_y * sin (rot_speed);
-          plane_y = old_plane_x * sin (rot_speed) + plane_y * cos (rot_speed);
+          double old_plane_x = plane.x;
+          plane.x = plane.x * cos (rot_speed) - plane.y * sin (rot_speed);
+          plane.y = old_plane_x * sin (rot_speed) + plane.y * cos (rot_speed);
         }
 
       BeginDrawing ();
@@ -113,8 +110,8 @@ main (void)
         {
           // x-coordinate in camera space
           double camera_x = 2 * x / double (SCREEN_WIDTH) - 1;
-          double ray_dir_x = direction.x + plane_x * camera_x;
-          double ray_dir_y = direction.y + plane_y * camera_x;
+          double ray_dir_x = direction.x + plane.x * camera_x;
+          double ray_dir_y = direction.y + plane.y * camera_x;
 
           // which map cell we're in
           int map_x = int (position.x);
