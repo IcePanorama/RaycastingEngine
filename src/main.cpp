@@ -109,9 +109,9 @@ main (void)
       for (int x = 0; x < SCREEN_WIDTH; x++)
         {
           // x-coordinate in camera space
-          double camera_x = 2 * x / double (SCREEN_WIDTH) - 1;
-          double ray_dir_x = direction.x + plane.x * camera_x;
-          double ray_dir_y = direction.y + plane.y * camera_x;
+          float camera_x = 2 * x / float (SCREEN_WIDTH) - 1;
+          Vector2 ray_dir = { direction.x + plane.x * camera_x,
+                              direction.y + plane.y * camera_x };
 
           // which map cell we're in
           int map_x = int (position.x);
@@ -122,9 +122,9 @@ main (void)
 
           // len of ray from one x- or y-side to the next x- or y-side
           double delta_dist_x
-              = (ray_dir_x == 0) ? 1e30 : std::abs (1 / ray_dir_x);
+              = (ray_dir.x == 0) ? 1e30 : std::abs (1 / ray_dir.x);
           double delta_dist_y
-              = (ray_dir_y == 0) ? 1e30 : std::abs (1 / ray_dir_y);
+              = (ray_dir.y == 0) ? 1e30 : std::abs (1 / ray_dir.y);
           double perp_wall_dist;
 
           // which directory to step in, x- or y-direction (either +1 or -1)
@@ -133,7 +133,7 @@ main (void)
           bool hit = false;
           int side; // was a NS or an ES wall hit?
 
-          if (ray_dir_x < 0)
+          if (ray_dir.x < 0)
             {
               step_x = -1;
               side_dist_x = (position.x - map_x) * delta_dist_x;
@@ -143,7 +143,7 @@ main (void)
               step_x = 1;
               side_dist_x = (map_x + 1.0 - position.x) * delta_dist_x;
             }
-          if (ray_dir_y < 0)
+          if (ray_dir.y < 0)
             {
               step_y = -1;
               side_dist_y = (position.y - map_y) * delta_dist_y;
