@@ -1,3 +1,4 @@
+#include "game_state.hpp"
 #include "player.hpp"
 
 #include <cmath>
@@ -5,112 +6,17 @@
 #include <iostream>
 #include <raylib.h>
 
-#define MAP_WIDTH 24
-#define MAP_HEIGHT 24
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
-
-int world_map[MAP_WIDTH][MAP_HEIGHT] = {
-  { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 0, 0, 0, 0, 5, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-  { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
-};
-
 int
 main (void)
 {
-  Player player (Vector2{ 12.0f, 12.0f }, Vector2{ -1.0f, 0.0f });
-  Vector2 plane = { 0.0f, 0.66f };
+  Player player (Vector2{ 12.0f, 12.0f }, Vector2{ -1.0f, 0.0f },
+                 Vector2{ 0.0f, 0.66f });
 
   InitWindow (SCREEN_WIDTH, SCREEN_HEIGHT, "Raycasting Engine");
 
   while (!WindowShouldClose ())
     {
-      double move_speed = player.movement_speed;
-      double rot_speed = player.rotation_speed * GetFrameTime ();
-
-      if (IsKeyDown (KEY_W) || IsKeyDown (KEY_UP))
-        {
-          double move_amount_x
-              = player.direction.x * move_speed * GetFrameTime ();
-          double move_amount_y
-              = player.direction.y * move_speed * GetFrameTime ();
-          if (world_map[(int)(player.position.x + move_amount_x)]
-                       [(int)player.position.y]
-              == 0)
-            {
-              player.position.x += move_amount_x;
-            }
-          if (world_map[(int)player.position.x]
-                       [(int)(player.position.y + move_amount_y)]
-              == 0)
-            {
-              player.position.y += move_amount_y;
-            }
-        }
-      if (IsKeyDown (KEY_S) || IsKeyDown (KEY_DOWN))
-        {
-          double move_amount_x
-              = player.direction.x * move_speed * GetFrameTime ();
-          double move_amount_y
-              = player.direction.y * move_speed * GetFrameTime ();
-          if (world_map[(int)(player.position.x - move_amount_x)]
-                       [(int)player.position.y]
-              == 0)
-            {
-              player.position.x -= move_amount_x;
-            }
-          if (world_map[(int)player.position.x]
-                       [(int)(player.position.y - move_amount_y)]
-              == 0)
-            {
-              player.position.y -= move_amount_y;
-            }
-        }
-      if (IsKeyDown (KEY_D) || IsKeyDown (KEY_RIGHT))
-        {
-          double old_dir_x = player.direction.x;
-          player.direction.x = player.direction.x * cos (-rot_speed)
-                               - player.direction.y * sin (-rot_speed);
-          player.direction.y = old_dir_x * sin (-rot_speed)
-                               + player.direction.y * cos (-rot_speed);
-          double old_plane_x = plane.x;
-          plane.x = plane.x * cos (-rot_speed) - plane.y * sin (-rot_speed);
-          plane.y
-              = old_plane_x * sin (-rot_speed) + plane.y * cos (-rot_speed);
-        }
-      if (IsKeyDown (KEY_A) || IsKeyDown (KEY_LEFT))
-        {
-          double old_dir_x = player.direction.x;
-          player.direction.x = player.direction.x * cos (rot_speed)
-                               - player.direction.y * sin (rot_speed);
-          player.direction.y = old_dir_x * sin (rot_speed)
-                               + player.direction.y * cos (rot_speed);
-          double old_plane_x = plane.x;
-          plane.x = plane.x * cos (rot_speed) - plane.y * sin (rot_speed);
-          plane.y = old_plane_x * sin (rot_speed) + plane.y * cos (rot_speed);
-        }
+      player.handle_input ();
 
       BeginDrawing ();
       ClearBackground (BLACK);
@@ -119,8 +25,9 @@ main (void)
         {
           // x-coordinate in camera space
           float camera_x = 2 * x / float (SCREEN_WIDTH) - 1;
-          Vector2 ray_dir = { player.direction.x + plane.x * camera_x,
-                              player.direction.y + plane.y * camera_x };
+          Vector2 ray_dir
+              = { player.direction.x + player.viewplane.x * camera_x,
+                  player.direction.y + player.viewplane.y * camera_x };
 
           // which map cell we're in
           int map_x = int (player.position.x);
