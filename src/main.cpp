@@ -1,7 +1,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-#include <ostream>
 #include <raylib.h>
 
 #define MAP_WIDTH 24
@@ -39,10 +38,10 @@ int world_map[MAP_WIDTH][MAP_HEIGHT] = {
 int
 main (void)
 {
-  double pos_x = 12.0;
-  double pos_y = 12.0;
-  double dir_x = -1.0;
-  double dir_y = 0.0;
+  // double pos_x = 12.0;
+  // double pos_y = 12.0;
+  Vector2 position = { 12.0f, 12.0f };
+  Vector2 direction = { -1.0f, 0.0f };
   double plane_x = 0.0;
   double plane_y = 0.66;
 
@@ -50,42 +49,46 @@ main (void)
 
   while (!WindowShouldClose ())
     {
-      std::cout << "FPS: " << GetFPS () << std::endl;
-
       double move_speed = 5.0;
       double rot_speed = 3.0 * GetFrameTime ();
 
       if (IsKeyDown (KEY_W) || IsKeyDown (KEY_UP))
         {
-          double move_amount_x = dir_x * move_speed * GetFrameTime ();
-          double move_amount_y = dir_y * move_speed * GetFrameTime ();
-          if (world_map[(int)(pos_x + move_amount_x)][(int)pos_y] == 0)
+          double move_amount_x = direction.x * move_speed * GetFrameTime ();
+          double move_amount_y = direction.y * move_speed * GetFrameTime ();
+          if (world_map[(int)(position.x + move_amount_x)][(int)position.y]
+              == 0)
             {
-              pos_x += move_amount_x;
+              position.x += move_amount_x;
             }
-          if (world_map[(int)pos_x][(int)(pos_y + move_amount_y)] == 0)
+          if (world_map[(int)position.x][(int)(position.y + move_amount_y)]
+              == 0)
             {
-              pos_y += move_amount_y;
+              position.y += move_amount_y;
             }
         }
       if (IsKeyDown (KEY_S) || IsKeyDown (KEY_DOWN))
         {
-          double move_amount_x = dir_x * move_speed * GetFrameTime ();
-          double move_amount_y = dir_y * move_speed * GetFrameTime ();
-          if (world_map[(int)(pos_x - move_amount_x)][(int)pos_y] == 0)
+          double move_amount_x = direction.x * move_speed * GetFrameTime ();
+          double move_amount_y = direction.y * move_speed * GetFrameTime ();
+          if (world_map[(int)(position.x - move_amount_x)][(int)position.y]
+              == 0)
             {
-              pos_x -= move_amount_x;
+              position.x -= move_amount_x;
             }
-          if (world_map[(int)pos_x][(int)(pos_y - move_amount_y)] == 0)
+          if (world_map[(int)position.x][(int)(position.y - move_amount_y)]
+              == 0)
             {
-              pos_y -= move_amount_y;
+              position.y -= move_amount_y;
             }
         }
       if (IsKeyDown (KEY_D) || IsKeyDown (KEY_RIGHT))
         {
-          double old_dir_x = dir_x;
-          dir_x = dir_x * cos (-rot_speed) - dir_y * sin (-rot_speed);
-          dir_y = old_dir_x * sin (-rot_speed) + dir_y * cos (-rot_speed);
+          double old_dir_x = direction.x;
+          direction.x = direction.x * cos (-rot_speed)
+                        - direction.y * sin (-rot_speed);
+          direction.y
+              = old_dir_x * sin (-rot_speed) + direction.y * cos (-rot_speed);
           double old_plane_x = plane_x;
           plane_x = plane_x * cos (-rot_speed) - plane_y * sin (-rot_speed);
           plane_y
@@ -93,9 +96,11 @@ main (void)
         }
       if (IsKeyDown (KEY_A) || IsKeyDown (KEY_LEFT))
         {
-          double old_dir_x = dir_x;
-          dir_x = dir_x * cos (rot_speed) - dir_y * sin (rot_speed);
-          dir_y = old_dir_x * sin (rot_speed) + dir_y * cos (rot_speed);
+          double old_dir_x = direction.x;
+          direction.x
+              = direction.x * cos (rot_speed) - direction.y * sin (rot_speed);
+          direction.y
+              = old_dir_x * sin (rot_speed) + direction.y * cos (rot_speed);
           double old_plane_x = plane_x;
           plane_x = plane_x * cos (rot_speed) - plane_y * sin (rot_speed);
           plane_y = old_plane_x * sin (rot_speed) + plane_y * cos (rot_speed);
@@ -108,12 +113,12 @@ main (void)
         {
           // x-coordinate in camera space
           double camera_x = 2 * x / double (SCREEN_WIDTH) - 1;
-          double ray_dir_x = dir_x + plane_x * camera_x;
-          double ray_dir_y = dir_y + plane_y * camera_x;
+          double ray_dir_x = direction.x + plane_x * camera_x;
+          double ray_dir_y = direction.y + plane_y * camera_x;
 
           // which map cell we're in
-          int map_x = int (pos_x);
-          int map_y = int (pos_y);
+          int map_x = int (position.x);
+          int map_y = int (position.y);
 
           // len of ray from current pos to next x- or y-side
           double side_dist_x, side_dist_y;
@@ -134,22 +139,22 @@ main (void)
           if (ray_dir_x < 0)
             {
               step_x = -1;
-              side_dist_x = (pos_x - map_x) * delta_dist_x;
+              side_dist_x = (position.x - map_x) * delta_dist_x;
             }
           else
             {
               step_x = 1;
-              side_dist_x = (map_x + 1.0 - pos_x) * delta_dist_x;
+              side_dist_x = (map_x + 1.0 - position.x) * delta_dist_x;
             }
           if (ray_dir_y < 0)
             {
               step_y = -1;
-              side_dist_y = (pos_y - map_y) * delta_dist_y;
+              side_dist_y = (position.y - map_y) * delta_dist_y;
             }
           else
             {
               step_y = 1;
-              side_dist_y = (map_y + 1.0 - pos_y) * delta_dist_y;
+              side_dist_y = (map_y + 1.0 - position.y) * delta_dist_y;
             }
 
           while (!hit)
@@ -206,10 +211,13 @@ main (void)
             }
 
           if (side == 1)
-            color = (Color){ color.r / 2, color.g / 2, color.b / 2, color.a };
+            color = Color{ (unsigned char)(color.r / 2.0),
+                           (unsigned char)(color.g / 2.0),
+                           (unsigned char)(color.b / 2.0), color.a };
 
           DrawLine (x, draw_start, x, draw_end, color);
         }
+      DrawFPS (0, 0);
       EndDrawing ();
     }
 

@@ -4,7 +4,7 @@ SRC_FILES=$(SRC_DIR)/*.cpp
 INCL_FILES=$(SRC_DIR)/*.hpp
 LIBS=-lraylib
 TARGET=main
-CFLAGS=#-Wall -Werror -Wextra -Wpedantic
+CFLAGS=-Wall -Werror -Wextra -Wpedantic
 STYLE=GNU
 
 all: clean format $(TARGET)
